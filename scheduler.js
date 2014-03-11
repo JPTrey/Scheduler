@@ -8,3 +8,4 @@ var hello = "hello, world!";
 console.log(hello);
 console.log("commit test");
 console.log("pull test");
+console.log("Test from linux");
