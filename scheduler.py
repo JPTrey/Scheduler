@@ -1,11 +1,9 @@
 # Scheduler.py by Jon Paul, 2014
 # Handles user input and returns all schedules fitting user filters
 
-from array import *
-
 """ Global Variables """
-schedules = []			# all schedules fit to user criteria
-courses = []			# all courses within a schedule
+# schedules = []			# all schedules fit to user criteria
+# courses = []			# all courses within a schedule
 
 """ Classes """
 # Course object representing a class entry
@@ -21,7 +19,7 @@ class Course:
 	def __str__():
 		print self.name
 
-	# Called when course has been added to any schedule
+	# (elective only) Called when course has been added to any schedule
 	def mark():
 		self.marked = True
 
@@ -45,8 +43,10 @@ class Meeting:
 
 """ Methods """
 
+# Called when program launches
+# returns: a list of classes to be placed into schedules
 def getClasses():
-	global courses
+	courses = []
 	done = false
 
 	while done is False:
@@ -58,22 +58,59 @@ def getClasses():
 		total_hours = duration * perweek
 		meetings = []
 		required = raw_input("Required? ('True' or 'False') ")
-
 		newCourse = Course(name, number, credits, total_hours, meetings, required)
 		courses.append(newCourse)
 		print courses
 		done = True
 	print courses[i].name
 
-def buildSchedules():
-	global courses
-	global schedules
-	marked = []								# courses already within a schedule
+# Called when either courses are first added, or user changes preferences
+# returns: a list of schedules fitting the criteria
+# TODO: deal with all targets
+#		prevent infinite loop condition
+def getSchedules(courses, target_days, target_credits, target_hours):
+	schedules = []						# schedules fitting the specified criteria
+	marked = 0							# courses already within a schedule
 
-	while marked.size() < courses.size()	# while: unique schedules can be constructed
+	while marked < len(courses):	# while: unique schedules can be constructed
+		newSchedule = []
+		days = []					
+		credits = 0
+		hours = 0
 
-#def displaySchedules():		
+		
+		# add required courses
+		for i in len(courses):
+			if courses[i].credits + credits > target_credits:
+				break
+			else if courses[i].required:				
+				newSchedule.append(courses[i])
+				credits += courses[i].credits
+				marked++
+		
+		# add unused courses
+		for i in len(courses):
+			if courses[i].credits + credits > target_credits:
+				break
+			else if courses[i].marked is False:
+				newSchedule.append(courses[i])
+				courses[i].marked = True				
 
-getClasses()
-#buildSchedules()
-#displaySchedules()
+		# add remaining courses
+		for i in len(courses):
+			if courses[i].credits + credits > target_credits:
+				break
+			# if credits >= target_credits:
+			#	break
+			else:
+				newSchedule.append(courses[i])
+		
+		schedules.append(newSchedule)				
+	return schedules			
+
+def displaySchedules():		
+
+
+classes = getClasses()
+schedules = getSchedules(classes, [1,5], 16, 0)
+displaySchedules(schedules)
